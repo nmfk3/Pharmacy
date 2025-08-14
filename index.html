@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صيدلية المُنَئ - نظام إدارة متكامل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        :root {
+            --primary: #2c5fa8;
+            --secondary: #4a8fe7;
+            --accent: #ff6b6b;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --text: #333; /* لون النص في الوضع النهاري */
+            --text-dark: #f0f0f0; /* لون النص في الوضع الليلي */
+            --border: #dee2e6;
+            --bg-gradient: linear-gradient(135deg, #e0f7fa, #f5f5f5);
+            --card-bg: white;
+            --header-bg: linear-gradient(90deg, #1e3c72, #2a5298);
+            --footer-bg: transparent;
+        }
+        
+        .dark-mode {
+            --primary: #4a8fe7;
+            --secondary: #2c5fa8;
+            --text: #f0f0f0; /* لون النص في الوضع الليلي (أبيض فاتح) */
+            --light: #1a1a1a;
+            --dark: #f8f9fa;
+            --border: #555; /* زيادة التباين في الوضع الليلي */
+            --bg-gradient: linear-gradient(135deg, #121212, #2d2d2d);
+            --card-bg: #222;
+            --header-bg: linear-gradient(90deg, #0d1b2a, #1b263b);
+            --footer-bg: #111;
+        }
+        
+        body {
+            background: var(--bg-gradient);
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: var(--header-bg);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.2)"/><circle cx="30" cy="30" r="3" fill="rgba(255,255,255,0.2)"/><circle cx="70" cy="20" r="1" fill="rgba(255,255,255,0.2)"/><circle cx="80" cy="70" r="4" fill="rgba(255,255,255,0.2)"/><circle cx="40" cy="80" r="2" fill="rgba(255,255,255,0.2)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            color: white;
+        }
+        
+        .doctor-name {
+            font-size: 1.5rem;
+            font-weight: 500;
+            display: block;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            color: white;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        .dashboard-section, .login-section, .form-section, .medicines-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dashboard-section h2, .form-section h2, .medicines-section h2, .login-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: var(--card-bg);
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 143, 231, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-add {
+            background: var(--success);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-update {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-cancel {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-login {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .btn-back {
+            background: var(--primary);
+            color: white;
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            padding: 10px 20px;
+            z-index: 10;
+            border-radius: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-add:hover {
+            background: #218838;
+        }
+        
+        .btn-update:hover {
+            background: #e0a800;
+        }
+        
+        .btn-cancel:hover {
+            background: #c82333;
+        }
+        
+        .medicines-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .medicine-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .medicine-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .medicine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .medicine-name {
+            font-size: 1.4rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .scientific-name {
+            color: var(--secondary);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .medicine-price {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .medicine-benefits {
+            margin: 15px 0;
+            line-height: 1.6;
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+        }
+        
+        .medicine-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+        
+        .btn-edit, .btn-delete, .btn-print {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-edit {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-print {
+            background: #6f42c1;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+        
+        .empty-state p {
+            font-size: 1.2rem;
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+            background: var(--card-bg);
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+            font-size: 0.9rem;
+            background: var(--footer-bg);
+            border-radius: 15px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .stock-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: #17a2b8;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+        
+        .category-tag {
+            background: #e9ecef;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 5px;
+            color: #333;
+        }
+        
+        .dark-mode .category-tag {
+            background: #444;
+            color: #fff; /* لون النص الأبيض في الوضع الليلي */
+        }
+        
+        .printable-area {
+            display: none;
+            padding: 20px;
+            background: white;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .printable-area, .printable-area * {
+                visibility: visible;
+            }
+            .printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: block;
+            }
+        }
+        
+        /* لوحة التحكم */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .dashboard-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+        
+        .dashboard-card i {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .dashboard-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .dashboard-card p {
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+            font-size: 0.95rem;
+        }
+        
+        /* زر الوضع الليلي */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: white;
+            z-index: 10;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* شريط الأدوية العامة */
+        .public-medicines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .public-medicine-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--primary);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .public-medicine-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .public-medicine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .public-medicine-name {
+            font-size: 1.3rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .public-scientific-name {
+            color: var(--secondary);
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .public-medicine-price {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .public-medicine-benefits {
+            margin: 15px 0;
+            line-height: 1.6;
+            font-size: 0.9rem;
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+        }
+        
+        .public-stock-indicator {
+            background: #17a2b8;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        /* إخفاء الأقسام غير المطلوبة */
+        .hidden {
+            display: none;
+        }
+        
+        .login-form {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-logo i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        /* تنبيهات المخزون */
+        .alert-bar {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .low-stock-alert {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+        
+        .dark-mode .low-stock-alert {
+            background-color: #333;
+            color: #fff;
+        }
+        
+        .expired-alert {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+        }
+        
+        .dark-mode .expired-alert {
+            background-color: #442;
+            color: #fff;
+        }
+        
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-count {
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+        
+        .low-stock-count {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .expired-count {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        
+        /* نظام الجرد الذكي */
+        .inventory-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .barcode-scanner {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .barcode-input {
+            flex: 1;
+        }
+        
+        .barcode-result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px dashed #ccc;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .dark-mode .barcode-result {
+            background: #333;
+            color: #fff;
+        }
+        
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 5rem;
+            color: #333;
+        }
+        
+        .dark-mode .qr-code {
+            background: #333;
+            color: #fff;
+        }
+        
+        .inventory-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .dark-mode .stat-card {
+            background: #333;
+            color: #fff;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+        }
+        
+        .dark-mode .stat-label {
+            color: #aaa;
+        }
+        
+        /* تاريخ الصلاحية */
+        .expiry-info {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text); /* استخدام لون النص المناسب للوضع */
+        }
+        
+        .expiring-soon {
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .dark-mode .expiring-soon {
+            background-color: #443300;
+            color: #fff;
+        }
+        
+        .expired {
+            background-color: #f8d7da;
+            border-left: 3px solid #dc3545;
+        }
+        
+        .dark-mode .expired {
+            background-color: #442;
+            color: #fff;
+        }
+        
+        .good {
+            background-color: #d4edda;
+            border-left: 3px solid #28a745;
+        }
+        
+        .dark-mode .good {
+            background-color: #224422;
+            color: #fff;
+        }
+        
+        /* تعديلات للهواتف المحمولة */
+        @media (max-width: 768px) {
+            .btn-back {
+                left: 10px;
+                bottom: 10px;
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .theme-toggle {
+                right: 10px;
+                top: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            header {
+                padding: 15px 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .doctor-name {
+                font-size: 1.2rem;
+                padding: 5px 15px;
+            }
+            
+            .dashboard-section, .login-section, .form-section, .medicines-section {
+                padding: 15px;
+            }
+            
+            .dashboard-card {
+                padding: 15px;
+            }
+            
+            .dashboard-card i {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* إضافة زر تسجيل الخروج */
+        .logout-container {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-message {
+            text-align: left;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="theme-toggle" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+            
+            <button class="btn-back hidden" id="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع لصفحة رئيسية
+            </button>
+            
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <h1>صيدلية المُنَئ</h1>
+            </div>
+            <span class="doctor-name">د. منئ قحطان</span>
+        </header>
+        
+        <!-- الصفحة الرئيسية -->
+        <section class="dashboard-section" id="dashboard-section">
+            <h2><i class="fas fa-home"></i> الصفحة الرئيسية</h2>
+            <p style="margin-bottom: 20px; text-align: center;">مرحباً بك في نظام إدارة صيدلية المُنَئ، اختر الخدمة التي تريدها:</p>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card" id="go-to-management">
+                    <i class="fas fa-tasks"></i>
+                    <h3>نظام إدارة الأدوية</h3>
+                    <p>إضافة وتعديل وحذف الأدوية في قاعدة البيانات</p>
+                </div>
+                
+                <div class="dashboard-card" id="go-to-medicines">
+                    <i class="fas fa-pills"></i>
+                    <h3>الأدوية المتوفرة</h3>
+                    <p>عرض قائمة كاملة بالأدوية المتوفرة في الصيدلية</p>
+                </div>
+            </div>
+            
+            <!-- تنبيهات المخزون -->
+            <div class="inventory-section">
+                <div class="inventory-header">
+                    <h3><i class="fas fa-bell"></i> تنبيهات المخزون والصلاحية</h3>
+                    <div>
+                        <label for="alert-threshold">حد التنبيه:</label>
+                        <input type="number" id="alert-threshold" min="1" value="5" style="width: 80px;">
+                    </div>
+                </div>
+                
+                <div class="alert-bar low-stock-alert" id="low-stock-alert">
+                    <div class="alert-content">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        <div>
+                            <strong>أدوية مخزونها منخفض</strong>
+                            <p>بعض الأدوية وصلت إلى الحد الأدنى من المخزون</p>
+                        </div>
+                    </div>
+                    <div class="alert-count low-stock-count" id="low-stock-count">0</div>
+                </div>
+                
+                <div class="alert-bar expired-alert" id="expired-alert">
+                    <div class="alert-content">
+                        <i class="fas fa-skull-crossbones fa-2x"></i>
+                        <div>
+                            <strong>أدوية منتهية الصلاحية</strong>
+                            <p>بعض الأدوية تحتاج إلى مراجعة فورية</p>
+                        </div>
+                    </div>
+                    <div class="alert-count expired-count" id="expired-count">0</div>
+                </div>
+            </div>
+            
+            <!-- نظام الجرد الذكي -->
+            <div class="inventory-section">
+                <h3><i class="fas fa-qrcode"></i> نظام الجرد الذكي</h3>
+                <p>استخدم قارئ الباركود لإدارة المخزون بسرعة وفعالية</p>
+                
+                <div class="barcode-scanner">
+                    <input type="text" class="barcode-input" id="barcode-input" placeholder="ادخل رقم الباركود يدوياً">
+                    <button class="btn-add" id="scan-btn">
+                        <i class="fas fa-camera"></i> مسح باركود
+                    </button>
+                </div>
+                
+                <div class="barcode-result" id="barcode-result">
+                    <div class="qr-code">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <p style="margin-top: 15px;">توجيه الكاميرا نحو باركود الدواء</p>
+                    <p id="barcode-info">لم يتم مسح أي باركود بعد</p>
+                </div>
+                
+                <div class="inventory-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">إجمالي الأدوية</div>
+                        <div class="stat-value" id="total-medicines">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">قيمة المخزون</div>
+                        <div class="stat-value" id="inventory-value">0 د.ع</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">الأصناف قيد التنبيه</div>
+                        <div class="stat-value" id="alert-items">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">أيام الجرد المتبقية</div>
+                        <div class="stat-value" id="inventory-days">7</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- صفحة تسجيل الدخول -->
+        <section class="login-section hidden" id="login-section">
+            <div class="login-form">
+                <div class="login-logo">
+                    <i class="fas fa-lock"></i>
+                    <h2>تسجيل الدخول إلى نظام الإدارة</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">اسم المستخدم:</label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">كلمة المرور:</label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn-login" id="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- نظام إدارة الأدوية -->
+        <section class="form-section hidden" id="management-section">
+            <div class="logout-container">
+                <button class="btn-cancel" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+            
+            <div class="welcome-message">
+                <i class="fas fa-user"></i> مرحبًا، muna
+            </div>
+            
+            <h2><i class="fas fa-tasks"></i> إدارة الأدوية</h2>
+            
+            <!-- تنبيهات المخزون في نظام الإدارة -->
+            <div class="alert-bar low-stock-alert" id="management-low-stock-alert" style="display: none;">
+                <div class="alert-content">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>أدوية مخزونها منخفض</strong>
+                        <p>يوجد <span id="management-low-stock-count">0</span> أدوية تحتاج إلى إعادة تخزين</p>
+                    </div>
+                </div>
+                <button class="btn-update" onclick="showLowStockMedicines()">
+                    <i class="fas fa-eye"></i> عرض التفاصيل
+                </button>
+            </div>
+            
+            <div class="alert-bar expired-alert" id="management-expired-alert" style="display: none;">
+                <div class="alert-content">
+                    <i class="fas fa-skull-crossbones"></i>
+                    <div>
+                        <strong>أدوية منتهية الصلاحية</strong>
+                        <p>يوجد <span id="management-expired-count">0</span> أدوية منتهية الصلاحية</p>
+                    </div>
+                </div>
+                <button class="btn-cancel" onclick="showExpiredMedicines()">
+                    <i class="fas fa-trash"></i> إزالة من المخزون
+                </button>
+            </div>
+            
+            <form id="medicine-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="name">اسم الدواء:</label>
+                    <input type="text" id="name" required placeholder="أدخل اسم الدواء">
+                </div>
+                <div class="form-group">
+                    <label for="scientific-name">الاسم العلمي:</label>
+                    <input type="text" id="scientific-name" required placeholder="أدخل الاسم العلمي">
+                </div>
+                <div class="form-group">
+                    <label for="price">السعر (دينار عراقي):</label>
+                    <input type="number" id="price" min="0" step="0.01" required placeholder="أدخل سعر الدواء">
+                </div>
+                <div class="form-group">
+                    <label for="benefits">الفوائد والاستخدامات:</label>
+                    <textarea id="benefits" required placeholder="أدخل فوائد الدواء واستخداماته"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">التصنيف العلاجي:</label>
+                    <select id="category">
+                        <option value="مسكنات">مسكنات</option>
+                        <option value="مضادات حيوية">مضادات حيوية</option>
+                        <option value="أمراض مزمنة">أمراض مزمنة</option>
+                        <option value="مكملات غذائية">مكملات غذائية</option>
+                        <option value="عناية بالبشرة">عناية بالبشرة</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="stock">الكمية المتاحة:</label>
+                    <input type="number" id="stock" min="0" value="10" required placeholder="أدخل الكمية المتاحة">
+                </div>
+                <div class="form-group">
+                    <label for="expiry-date">تاريخ انتهاء الصلاحية:</label>
+                    <input type="date" id="expiry-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="barcode">باركود الدواء (اختياري):</label>
+                    <input type="text" id="barcode" placeholder="أدخل باركود الدواء">
+                    <button type="button" class="btn-update" style="margin-top: 10px; width: 100%;" onclick="generateBarcode()">
+                        <i class="fas fa-barcode"></i> توليد باركود عشوائي
+                    </button>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn-add">
+                        <i class="fas fa-save"></i> حفظ الدواء
+                    </button>
+                    <button type="button" class="btn-update" id="update-btn" style="display: none;">
+                        <i class="fas fa-edit"></i> تحديث
+                    </button>
+                    <button type="button" class="btn-cancel" id="cancel-btn" style="display: none;">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </form>
+            
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search" placeholder="ابحث عن دواء بالاسم أو التصنيف...">
+            </div>
+            
+            <div class="medicines-list" id="medicines-list">
+                <!-- سيتم ملؤها بالأدوية عبر JavaScript -->
+            </div>
+        </section>
+        
+        <!-- عرض الأدوية المتاحة -->
+        <section class="medicines-section hidden" id="medicines-section">
+            <h2><i class="fas fa-capsules"></i> الأدوية المتوفرة في الصيدلية</h2>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="public-search" placeholder="ابحث عن دواء بالاسم أو التصنيف...">
+            </div>
+            <div class="public-medicines-grid" id="public-medicines-list">
+                <!-- سيتم ملؤها بالأدوية عبر JavaScript -->
+            </div>
+        </section>
+        
+        <footer>
+            <p>© 2025 صيدلية المُنَئ - جميع الحقوق محفوظة</p>
+            <p>نظام إدارة الصيدليات | الإصدار 3.0</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <div class="printable-area" id="printable-area">
+        <h2 style="text-align: center; margin-bottom: 20px;">صيدلية المُنَئ - د. منئ قحطان</h2>
+        <h3 style="text-align: center; margin-bottom: 30px;">قائمة الأدوية</h3>
+        <div id="print-content"></div>
+        <p style="text-align: center; margin-top: 30px; font-style: italic;">تاريخ الطباعة: <span id="print-date"></span></p>
+    </div>
+    
+    <script>
+        // متغيرات التطبيق
+        let medicines = JSON.parse(localStorage.getItem('medicines')) || [];
+        let isEditing = false;
+        let currentEditId = null;
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+        let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        let alertThreshold = localStorage.getItem('alertThreshold') || 5;
+        
+        // بيانات تسجيل الدخول
+        const ADMIN_CREDENTIALS = {
+            username: "muna",
+            password: "2006"
+        };
+
+        // عناصر DOM
+        const medicineForm = document.getElementById('medicine-form');
+        const medicinesList = document.getElementById('medicines-list');
+        const searchInput = document.getElementById('search');
+        const updateBtn = document.getElementById('update-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const notification = document.getElementById('notification');
+        const categoryInput = document.getElementById('category');
+        const stockInput = document.getElementById('stock');
+        const expiryDateInput = document.getElementById('expiry-date');
+        const barcodeInput = document.getElementById('barcode');
+        const themeToggle = document.getElementById('theme-toggle');
+        const publicSearchInput = document.getElementById('public-search');
+        const publicMedicinesList = document.getElementById('public-medicines-list');
+        const backBtn = document.getElementById('back-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const alertThresholdInput = document.getElementById('alert-threshold');
+        const lowStockAlert = document.getElementById('low-stock-alert');
+        const expiredAlert = document.getElementById('expired-alert');
+        const lowStockCount = document.getElementById('low-stock-count');
+        const expiredCount = document.getElementById('expired-count');
+        const scanBtn = document.getElementById('scan-btn');
+        const barcodeInfo = document.getElementById('barcode-info');
+        const totalMedicines = document.getElementById('total-medicines');
+        const inventoryValue = document.getElementById('inventory-value');
+        const alertItems = document.getElementById('alert-items');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        // عناصر الأقسام
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginSection = document.getElementById('login-section');
+        const managementSection = document.getElementById('management-section');
+        const medicinesSection = document.getElementById('medicines-section');
+        
+        // عناصر التنقل
+        const goToManagement = document.getElementById('go-to-management');
+        const goToMedicines = document.getElementById('go-to-medicines');
+        
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', () => {
+            // تطبيق وضع التصميم
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            // التحقق من حالة تسجيل الدخول
+            checkLoginStatus();
+            
+            // تعيين تاريخ افتراضي للصلاحية (3 أشهر من الآن)
+            const defaultExpiry = new Date();
+            defaultExpiry.setMonth(defaultExpiry.getMonth() + 3);
+            expiryDateInput.valueAsDate = defaultExpiry;
+            
+            // البحث في الأدوية
+            searchInput.addEventListener('input', () => {
+                renderMedicines();
+            });
+            
+            // البحث في الأدوية العامة
+            publicSearchInput.addEventListener('input', () => {
+                renderPublicMedicines();
+            });
+            
+            // إرسال النموذج
+            medicineForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const medicine = {
+                    id: isEditing ? currentEditId : Date.now().toString(),
+                    name: document.getElementById('name').value.trim(),
+                    scientificName: document.getElementById('scientific-name').value.trim(),
+                    price: parseFloat(document.getElementById('price').value),
+                    benefits: document.getElementById('benefits').value.trim(),
+                    category: document.getElementById('category').value,
+                    stock: parseInt(document.getElementById('stock').value),
+                    expiryDate: document.getElementById('expiry-date').value,
+                    barcode: document.getElementById('barcode').value.trim() || generateRandomBarcode()
+                };
+                
+                if (isEditing) {
+                    updateMedicine(medicine);
+                } else {
+                    addMedicine(medicine);
+                }
+                
+                resetForm();
+            });
+            
+            // زر الإلغاء
+            cancelBtn.addEventListener('click', () => {
+                resetForm();
+            });
+            
+            // تبديل الوضع الليلي
+            themeToggle.addEventListener('click', () => {
+                darkMode = !darkMode;
+                localStorage.setItem('darkMode', darkMode);
+                
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+            });
+            
+            // أحداث التنقل
+            goToManagement.addEventListener('click', () => {
+                if (isLoggedIn) {
+                    showManagement();
+                } else {
+                    showLogin();
+                }
+            });
+            
+            goToMedicines.addEventListener('click', showMedicines);
+            
+            // تسجيل الدخول
+            loginBtn.addEventListener('click', () => {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    isLoggedIn = true;
+                    localStorage.setItem('isLoggedIn', 'true');
+                    showManagement();
+                    showNotification('تم تسجيل الدخول بنجاح', 'success');
+                } else {
+                    showNotification('اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+                }
+            });
+            
+            // حدث النقر على زر الرجوع
+            backBtn.addEventListener('click', () => {
+                showDashboard();
+            });
+            
+            // تحديث تنبيهات المخزون
+            alertThresholdInput.value = alertThreshold;
+            alertThresholdInput.addEventListener('change', () => {
+                alertThreshold = parseInt(alertThresholdInput.value);
+                localStorage.setItem('alertThreshold', alertThreshold);
+                updateStockAlerts();
+                updateInventoryStats();
+            });
+            
+            // مسح الباركود
+            scanBtn.addEventListener('click', () => {
+                simulateBarcodeScan();
+            });
+            
+            // زر تسجيل الخروج
+            logoutBtn.addEventListener('click', () => {
+                isLoggedIn = false;
+                localStorage.setItem('isLoggedIn', 'false');
+                showDashboard();
+                showNotification('تم تسجيل الخروج بنجاح', 'success');
+            });
+            
+            // تحديث الإحصائيات والتنبيهات
+            updateStockAlerts();
+            updateInventoryStats();
+        });
+        
+        // التحقق من حالة تسجيل الدخول
+        function checkLoginStatus() {
+            if (isLoggedIn) {
+                showDashboard();
+            } else {
+                showDashboard();
+            }
+        }
+        
+        // وظائف التنقل
+        function showDashboard() {
+            dashboardSection.classList.remove('hidden');
+            loginSection.classList.add('hidden');
+            managementSection.classList.add('hidden');
+            medicinesSection.classList.add('hidden');
+            
+            // إخفاء زر الرجوع
+            backBtn.classList.add('hidden');
+        }
+        
+        function showLogin() {
+            dashboardSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+            managementSection.classList.add('hidden');
+            medicinesSection.classList.add('hidden');
+            
+            // إظهار زر الرجوع
+            backBtn.classList.remove('hidden');
+        }
+        
+        function showManagement() {
+            if (!isLoggedIn) {
+                showLogin();
+                return;
+            }
+            
+            dashboardSection.classList.add('hidden');
+            loginSection.classList.add('hidden');
+            managementSection.classList.remove('hidden');
+            medicinesSection.classList.add('hidden');
+            
+            // إظهار زر الرجوع
+            backBtn.classList.remove('hidden');
+            
+            renderMedicines();
+            updateManagementAlerts();
+        }
+        
+        function showMedicines() {
+            dashboardSection.classList.add('hidden');
+            loginSection.classList.add('hidden');
+            managementSection.classList.add('hidden');
+            medicinesSection.classList.remove('hidden');
+            
+            // إظهار زر الرجوع
+            backBtn.classList.remove('hidden');
+            
+            renderPublicMedicines();
+        }
+        
+        // إضافة دواء جديد
+        function addMedicine(medicine) {
+            medicines.push(medicine);
+            saveToLocalStorage();
+            renderMedicines();
+            renderPublicMedicines();
+            updateStockAlerts();
+            updateInventoryStats();
+            updateManagementAlerts();
+            showNotification('تم إضافة الدواء بنجاح', 'success');
+        }
+        
+        // تحديث دواء
+        function updateMedicine(updatedMedicine) {
+            medicines = medicines.map(medicine => 
+                medicine.id === updatedMedicine.id ? updatedMedicine : medicine
+            );
+            saveToLocalStorage();
+            renderMedicines();
+            renderPublicMedicines();
+            updateStockAlerts();
+            updateInventoryStats();
+            updateManagementAlerts();
+            showNotification('تم تحديث الدواء بنجاح', 'success');
+        }
+        
+        // حذف دواء
+        function deleteMedicine(id) {
+            if (confirm('هل أنت متأكد من رغبتك في حذف هذا الدواء؟')) {
+                medicines = medicines.filter(medicine => medicine.id !== id);
+                saveToLocalStorage();
+                renderMedicines();
+                renderPublicMedicines();
+                updateStockAlerts();
+                updateInventoryStats();
+                updateManagementAlerts();
+                showNotification('تم حذف الدواء بنجاح', 'success');
+            }
+        }
+        
+        // تعبئة النموذج للتعديل
+        function editMedicine(id) {
+            const medicine = medicines.find(med => med.id === id);
+            if (medicine) {
+                isEditing = true;
+                currentEditId = id;
+                
+                document.getElementById('edit-id').value = medicine.id;
+                document.getElementById('name').value = medicine.name;
+                document.getElementById('scientific-name').value = medicine.scientificName;
+                document.getElementById('price').value = medicine.price;
+                document.getElementById('benefits').value = medicine.benefits;
+                document.getElementById('category').value = medicine.category;
+                document.getElementById('stock').value = medicine.stock;
+                document.getElementById('expiry-date').value = medicine.expiryDate;
+                document.getElementById('barcode').value = medicine.barcode;
+                
+                updateBtn.style.display = 'block';
+                cancelBtn.style.display = 'block';
+                
+                // تمرير النموذج إلى الأعلى
+                document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // إعادة تعيين النموذج
+        function resetForm() {
+            medicineForm.reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('category').value = 'مسكنات';
+            document.getElementById('stock').value = 10;
+            
+            // تعيين تاريخ افتراضي للصلاحية (3 أشهر من الآن)
+            const defaultExpiry = new Date();
+            defaultExpiry.setMonth(defaultExpiry.getMonth() + 3);
+            expiryDateInput.valueAsDate = defaultExpiry;
+            
+            document.getElementById('barcode').value = '';
+            
+            isEditing = false;
+            currentEditId = null;
+            updateBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+        }
+        
+        // توليد باركود عشوائي
+        function generateBarcode() {
+            const randomBarcode = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+            barcodeInput.value = randomBarcode;
+        }
+        
+        // إنشاء باركود عشوائي
+        function generateRandomBarcode() {
+            return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+        }
+        
+        // محاكاة مسح الباركود
+        function simulateBarcodeScan() {
+            if (medicines.length === 0) {
+                barcodeInfo.innerHTML = "لا يوجد أدوية في المخزون";
+                return;
+            }
+            
+            const randomMedicine = medicines[Math.floor(Math.random() * medicines.length)];
+            const barcode = randomMedicine.barcode || generateRandomBarcode();
+            
+            // تحديث واجهة المستخدم
+            document.getElementById('barcode-input').value = barcode;
+            barcodeInfo.innerHTML = `
+                <strong>تم مسح الدواء:</strong> ${randomMedicine.name}<br>
+                <strong>الكمية:</strong> ${randomMedicine.stock}<br>
+                <strong>تاريخ الصلاحية:</strong> ${formatDate(randomMedicine.expiryDate)}
+            `;
+            
+            showNotification(`تم مسح الدواء: ${randomMedicine.name}`, 'success');
+        }
+        
+        // تحديث تنبيهات المخزون
+        function updateStockAlerts() {
+            const threshold = parseInt(alertThreshold);
+            const lowStockItems = medicines.filter(med => med.stock <= threshold && med.stock > 0);
+            const expiredItems = medicines.filter(med => isExpired(med.expiryDate));
+            
+            lowStockCount.textContent = lowStockItems.length;
+            expiredCount.textContent = expiredItems.length;
+            
+            lowStockAlert.style.display = lowStockItems.length > 0 ? 'flex' : 'none';
+            expiredAlert.style.display = expiredItems.length > 0 ? 'flex' : 'none';
+        }
+        
+        // تحديث تنبيهات الإدارة
+        function updateManagementAlerts() {
+            const threshold = parseInt(alertThreshold);
+            const lowStockItems = medicines.filter(med => med.stock <= threshold && med.stock > 0);
+            const expiredItems = medicines.filter(med => isExpired(med.expiryDate));
+            
+            document.getElementById('management-low-stock-count').textContent = lowStockItems.length;
+            document.getElementById('management-expired-count').textContent = expiredItems.length;
+            
+            document.getElementById('management-low-stock-alert').style.display = lowStockItems.length > 0 ? 'flex' : 'none';
+            document.getElementById('management-expired-alert').style.display = expiredItems.length > 0 ? 'flex' : 'none';
+        }
+        
+        // تحديث إحصائيات المخزون
+        function updateInventoryStats() {
+            totalMedicines.textContent = medicines.length;
+            
+            const totalValue = medicines.reduce((sum, med) => sum + (med.price * med.stock), 0);
+            inventoryValue.textContent = totalValue.toFixed(2) + ' د.ع';
+            
+            const threshold = parseInt(alertThreshold);
+            const alertItemsCount = medicines.filter(med => 
+                med.stock <= threshold || isExpired(med.expiryDate)
+            ).length;
+            alertItems.textContent = alertItemsCount;
+        }
+        
+        // التحقق من انتهاء الصلاحية
+        function isExpired(expiryDate) {
+            const today = new Date();
+            const expiry = new Date(expiryDate);
+            return expiry < today;
+        }
+        
+        // التحقق من قرب انتهاء الصلاحية (30 يوم)
+        function isExpiringSoon(expiryDate) {
+            const today = new Date();
+            const expiry = new Date(expiryDate);
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+            
+            return expiry > today && expiry <= thirtyDaysFromNow;
+        }
+        
+        // تنسيق التاريخ
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-IQ');
+        }
+        
+        // عرض الأدوية في نظام الإدارة
+        function renderMedicines() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            const filteredMedicines = medicines.filter(medicine => 
+                medicine.name.toLowerCase().includes(searchTerm) ||
+                medicine.scientificName.toLowerCase().includes(searchTerm) ||
+                medicine.category.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredMedicines.length === 0) {
+                medicinesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-pills"></i>
+                        <p>${searchTerm ? 'لم يتم العثور على أدوية' : 'لا توجد أدوية مسجلة بعد'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            medicinesList.innerHTML = filteredMedicines.map(medicine => {
+                let expiryClass = 'good';
+                let expiryText = 'صلاحية جيدة';
+                
+                if (isExpired(medicine.expiryDate)) {
+                    expiryClass = 'expired';
+                    expiryText = 'منتهي الصلاحية';
+                } else if (isExpiringSoon(medicine.expiryDate)) {
+                    expiryClass = 'expiring-soon';
+                    expiryText = 'ينتهي قريباً';
+                }
+                
+                return `
+                <div class="medicine-card">
+                    <div class="medicine-header">
+                        <div class="medicine-name">${medicine.name}</div>
+                        <div class="medicine-price">${medicine.price.toFixed(2)} د.ع</div>
+                    </div>
+                    <div class="scientific-name">${medicine.scientificName}</div>
+                    <div class="category-tag">${medicine.category}</div>
+                    <div class="medicine-benefits">
+                        <strong>الفوائد والاستخدامات:</strong>
+                        <p>${medicine.benefits}</p>
+                    </div>
+                    <div class="expiry-info ${expiryClass}">
+                        <strong>تاريخ الصلاحية:</strong> ${formatDate(medicine.expiryDate)}
+                        <span>(${expiryText})</span>
+                    </div>
+                    <div class="stock-indicator">
+                        ${medicine.stock > 0 ? `المخزون: ${medicine.stock}` : 'نفذ من المخزون'}
+                    </div>
+                    <div class="medicine-actions">
+                        <button class="btn-edit" onclick="editMedicine('${medicine.id}')">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="btn-delete" onclick="deleteMedicine('${medicine.id}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        // عرض الأدوية للجمهور
+        function renderPublicMedicines() {
+            const searchTerm = publicSearchInput.value.toLowerCase();
+            
+            const filteredMedicines = medicines.filter(medicine => 
+                medicine.name.toLowerCase().includes(searchTerm) ||
+                medicine.scientificName.toLowerCase().includes(searchTerm) ||
+                medicine.category.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredMedicines.length === 0) {
+                publicMedicinesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-pills"></i>
+                        <p>${searchTerm ? 'لم يتم العثور على أدوية' : 'لا توجد أدوية مسجلة بعد'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            publicMedicinesList.innerHTML = filteredMedicines.map(medicine => {
+                let expiryClass = 'good';
+                let expiryText = 'صلاحية جيدة';
+                
+                if (isExpired(medicine.expiryDate)) {
+                    expiryClass = 'expired';
+                    expiryText = 'منتهي الصلاحية';
+                } else if (isExpiringSoon(medicine.expiryDate)) {
+                    expiryClass = 'expiring-soon';
+                    expiryText = 'ينتهي قريباً';
+                }
+                
+                return `
+                <div class="public-medicine-card">
+                    <div class="public-medicine-header">
+                        <div class="public-medicine-name">${medicine.name}</div>
+                        <div class="public-medicine-price">${medicine.price.toFixed(2)} د.ع</div>
+                    </div>
+                    <div class="public-scientific-name">${medicine.scientificName}</div>
+                    <div class="category-tag">${medicine.category}</div>
+                    <div class="public-medicine-benefits">
+                        <strong>الفوائد:</strong>
+                        <p>${medicine.benefits}</p>
+                    </div>
+                    <div class="expiry-info ${expiryClass}">
+                        <strong>تاريخ الصلاحية:</strong> ${formatDate(medicine.expiryDate)}
+                        <span>(${expiryText})</span>
+                    </div>
+                    <div class="public-stock-indicator">
+                        ${medicine.stock > 0 ? `المخزون: ${medicine.stock}` : 'نفذ من المخزون'}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        // حفظ في التخزين المحلي
+        function saveToLocalStorage() {
+            localStorage.setItem('medicines', JSON.stringify(medicines));
+        }
+        
+        // عرض الإشعارات
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // إضافة بعض الأمثلة عند التحميل الأولي إذا لم يكن هناك بيانات
+        if (medicines.length === 0) {
+            // تعيين تاريخ انتهاء الصلاحية (3 أشهر من الآن)
+            const expiryDate = new Date();
+            expiryDate.setMonth(expiryDate.getMonth() + 3);
+            
+            medicines = [
+                {
+                    id: '1',
+                    name: 'بنادول',
+                    scientificName: 'باراسيتامول',
+                    price: 20000,
+                    benefits: 'مسكن للألم وخافض للحرارة',
+                    category: 'مسكنات',
+                    stock: 15,
+                    expiryDate: expiryDate.toISOString().split('T')[0],
+                    barcode: '123456789012'
+                },
+                {
+                    id: '2',
+                    name: 'فولتارين',
+                    scientificName: 'ديكلوفيناك',
+                    price: 35000,
+                    benefits: 'مضاد للالتهابات ومسكن للألم',
+                    category: 'مسكنات',
+                    stock: 8,
+                    expiryDate: expiryDate.toISOString().split('T')[0],
+                    barcode: '234567890123'
+                },
+                {
+                    id: '3',
+                    name: 'فنتولين',
+                    scientificName: 'سالبوتامول',
+                    price: 45000,
+                    benefits: 'علاج لأعراض الربو وضيق التنفس',
+                    category: 'أمراض مزمنة',
+                    stock: 12,
+                    expiryDate: expiryDate.toISOString().split('T')[0],
+                    barcode: '345678901234'
+                },
+                {
+                    id: '4',
+                    name: 'اوميبرازول',
+                    scientificName: 'أوميبرازول',
+                    price: 55000,
+                    benefits: 'علاج قرحة المعدة والارتجاع المريئي',
+                    category: 'أمراض مزمنة',
+                    stock: 5,
+                    expiryDate: expiryDate.toISOString().split('T')[0],
+                    barcode: '456789012345'
+                }
+            ];
+            saveToLocalStorage();
+        }
+        
+        // وظائف للتنبيهات (وهمية للعرض)
+        function showLowStockMedicines() {
+            const threshold = parseInt(alertThreshold);
+            const lowStockItems = medicines.filter(med => med.stock <= threshold && med.stock > 0);
+            
+            let message = "الأدوية ذات المخزون المنخفض:\n";
+            lowStockItems.forEach(item => {
+                message += `- ${item.name} (المخزون: ${item.stock})\n`;
+            });
+            
+            alert(message);
+        }
+        
+        function showExpiredMedicines() {
+            const expiredItems = medicines.filter(med => isExpired(med.expiryDate));
+            
+            if (expiredItems.length === 0) {
+                alert("لا يوجد أدوية منتهية الصلاحية");
+                return;
+            }
+            
+            if (confirm(`هل تريد حذف ${expiredItems.length} دواء منتهي الصلاحية؟`)) {
+                medicines = medicines.filter(med => !isExpired(med.expiryDate));
+                saveToLocalStorage();
+                renderMedicines();
+                renderPublicMedicines();
+                updateStockAlerts();
+                updateInventoryStats();
+                updateManagementAlerts();
+                showNotification('تم إزالة الأدوية منتهية الصلاحية', 'success');
+            }
+        }
+    </script>
+</body>
+</html>
